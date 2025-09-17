@@ -1,65 +1,80 @@
 <div align="center">
-  <h1>DNS_CHANGER — DNS Checker / Changer</h1>
-  <p>Electron + Vite + React (TypeScript)</p>
+  <h1>DNS_CHANGER</h1>
+  <p>DNS Checker / DNS Changer — Electron + Vite + React (TypeScript)</p>
 </div>
 
-سلام — این مخزن برای اجرای یک اپ دسکتاپ ساخته شده با Electron (برای main/preload) و Vite + React (برای renderer) آماده است.
+Overview
+--------
 
-This repository contains a desktop app scaffold using Electron (TypeScript) for the main and preload processes, and Vite + React for the renderer.
+This repository is a desktop application scaffold using Electron for the main and preload processes (TypeScript), and Vite + React for the renderer. The project compiles Electron TypeScript files into `dist-electron/` before launching so Electron does not attempt to execute `.ts` sources directly.
 
----
+Quick start
+-----------
 
-### Short quickstart — کوتاه و سریع
+Requirements
+- Node.js 18+ (LTS recommended)
+- npm
 
-1. نصب وابستگی‌ها:
+Install dependencies:
 
 ```powershell
 npm install
 ```
 
-2. حالت توسعه (دو ترمینال):
+Development (recommended)
 
-ترمینال ۱ — سرور توسعه رندرر:
+1. Start Vite (renderer dev server):
 
 ```powershell
 npm run dev
 ```
 
-ترمینال ۲ — اجرای Electron (کامپایل main/preload قبل از اجرا):
+2. In a second terminal start Electron (this will compile main & preload automatically before launching):
 
 ```powershell
 npm run start
 ```
 
-3. ساخت تولیدی (برای تست محلی):
+Production build (local test)
 
 ```powershell
+# Build renderer
 npx vite build
+
+# Compile electron main & preload
 npm run build:main
 npm run build:preload
+
+# Start the app (uses compiled electron files)
 npm run start
 ```
 
----
+Packaging
+---------
 
-### Why these custom scripts? — چرا این تغییرات لازم بود
+The `build` script in `package.json` runs the renderer build, compiles electron sources, then executes `electron-builder`. Configure `electron-builder` settings in `package.json` before releasing.
 
-- Electron cannot run `.ts` files directly. We compile `electron/*.ts` into `dist-electron/` before launching.
-- Vite `base` is set to `./` so production `dist/index.html` uses relative asset paths and works with `file://`.
-- The main process must load the compiled preload script (see `electron/main.ts`), not the `.ts` source.
+Important notes
+---------------
 
-### Troubleshooting — اشکال‌زدایی سریع
+- Electron cannot execute TypeScript directly. Use the provided build scripts (`build:main`, `build:preload`) so `dist-electron/` contains runnable JS.
+- Vite `base` is set to `./` so production asset paths are relative and work with the `file://` protocol in packaged apps.
+- Ensure `electron/main.ts` points to the compiled preload file inside `dist-electron/preload/`.
 
-- Unknown file extension ".ts": اجرای `npm run build:main` و `npm run build:preload` حل می‌کند.
-- ENOENT preload: مطمئن شوید `dist-electron/preload/preload.js` وجود دارد و `main.ts` به آن اشاره می‌کند.
-- White screen / ERR_FILE_NOT_FOUND: یا `npx vite build` را اجرا کنید یا `npm run dev` را فعال کنید و سپس Electron را اجرا کنید.
+Troubleshooting
+---------------
 
----
+- "Unknown file extension .ts": run `npm run build:main`.
+- "ENOENT preload": run `npm run build:preload` and verify `dist-electron/preload/preload.js` exists.
+- Renderer white screen or `ERR_FILE_NOT_FOUND`: run `npx vite build` to create `dist` or run `npm run dev` and start Electron while the dev server is running.
 
-If you want, I can also:
+Contributing & next steps
+-------------------------
 
-- Add an `MIT` license file.
-- Add a GitHub Action to run `tsc --noEmit` and `npx vite build` on PRs.
-- Normalize preload output name and simplify `main.ts` logic.
+If you want, I can add:
 
-Tell me which of those you'd like me to add, and I'll commit and push the change.
+- A LICENSE file (MIT by default).
+- A GitHub Actions workflow to run `tsc --noEmit` and `npx vite build` on pushes/PRs.
+- A convenience script like `npm run dev:electron` that launches the renderer dev server and Electron together.
+
+Tell me which of the above you'd like and I'll add it and push to the remote.
